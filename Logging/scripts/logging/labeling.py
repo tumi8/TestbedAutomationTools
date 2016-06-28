@@ -97,8 +97,9 @@ def loadpcaps(folder, namedict):
     pcapdict = {}
 
     for filename in filenames:
+        #TODO check for file extension, if not pcap call function
         packetdict = {}
-
+        
         with RawPcapReader(folder+filename) as sub_pcap_reader:
             for sub_raw_pkt in sub_pcap_reader:
                 sub_pkt = sub_raw_pkt[0]
@@ -151,7 +152,7 @@ def main():
 
     ldpcapstart = timer()
 
-    loadedpcaps = loadpcaps(folder, namedict)#gives dict with key filename that gives dict with key l3pkt:cgroupID
+    loadedpcaps = loadpcaps(folder, namedict)#gives dict with key:filename, value:(dict wihth key:l3pkt, value:cgroupID)
     filenames = loadedpcaps[0]
     pcapdict = loadedpcaps[1]
 
