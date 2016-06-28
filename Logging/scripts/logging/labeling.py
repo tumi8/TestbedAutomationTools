@@ -1,15 +1,17 @@
+#!/usr/bin/env python3
+#  Labeling.py, used to create keyfiles for network dumps 
+#  Copyright (C) 2016  Christian Luebben
+#  Params: main dump, dump-folder, id-folder, keyfile
+#  Remark: UID and GID available in tlv header
+
 import sys
 import os
 import hashlib
 from timeit import default_timer as timer
 from scapy.all import RawPcapReader
 
-#params: main dump, dumpfolder, id folder, outfile
-
-#remark: UID and GID available in tlv header
-
 ######################## Extract payload from TLV Packet ######################
-def findpayloadtlv(pointer, act, filename, namedict):#pkt2,ts2,filename,payload from main
+def findpayloadtlv(pointer, act, filename, namedict):#Parse the TLV-Header and return l3pkt, cgroupID
     length2 = int.from_bytes(act[(pointer):(pointer+2)], 'little')
     type2 = int.from_bytes(act[(pointer+2):(pointer+4)], 'little')
     retval = False
@@ -26,7 +28,7 @@ def findpayloadtlv(pointer, act, filename, namedict):#pkt2,ts2,filename,payload 
     if type2 == 9:
 
         group1 = int.from_bytes(act[2:4], 'big')#little endian #CgroupID
-        origin = filename.partition(".")[0] #hostname, TODO einmal reicht
+        origin = filename.partition(".")[0]
         foundval = False
 
         if origin in namedict:
@@ -50,7 +52,7 @@ def searchpcap(pkt, filenames, pcapdict, framecounter, namedict, target):
 
     for filename in filenames:
 
-        origin = filename.partition(".")[0] #hostname, TODO einmal reicht
+        origin = filename.partition(".")[0]
 
         if shawert in pcapdict[filename]:
 
@@ -101,11 +103,10 @@ def loadpcaps(folder, namedict):
             for sub_raw_pkt in sub_pcap_reader:
                 sub_pkt = sub_raw_pkt[0]
 
-            #for ts, pkt in pcap: #parse and save l3+up : cgroupID
                 l3pkt = findpayloadtlv(4, sub_pkt, filename, namedict) #first 4B can be skipped
                 l3pkthash = hashlib.sha512(l3pkt[0]).hexdigest()
 
-                if l3pkt[1] == 0:#necessary because subdumps sometimes contain duplicate packets w. ID0
+                if l3pkt[1] == 0:#necessary because subdumps sometimes contain duplicate packets w. ID=0
                     if l3pkthash in packetdict:
                         continue
                 packetdict[l3pkthash] = l3pkt[1]
@@ -113,7 +114,6 @@ def loadpcaps(folder, namedict):
         pcapdict[filename] = packetdict
 
     return (filenames, pcapdict)
-
 ######################## Main #################################################
 def main():
 
@@ -122,14 +122,14 @@ def main():
         dump = sys.argv[1]
         folder = sys.argv[2]
         idfolder = sys.argv[3]
-        outpath = "keyfile"
+        outpath = "keyfile"#set default value
     except:
         print("keyfile creation failed, check params")
         sys.exit(0)
 
-    try: #if len groesser, -h for help, pcap ng - Fehlerbehandlung bei Fehleingaben
+    try:
         outpath = sys.argv[4]
-        target = open(outpath, 'w')#frage ob overwrite?
+        target = open(outpath, 'w')
         print("writing key entries to: " +str(outpath))
     except:
         try:
@@ -169,7 +169,7 @@ def main():
                 gefunden = False
                 gefunden = searchpcap(pkt, filenames, pcapdict, framecounter, namedict, target)
 
-                if gefunden is False:#falls erfolglose suche in allen dateien scheibe folgendes in die keyfile
+                if gefunden is False:#if packet not found write the following to keyfile
                     target.write(str(framecounter)+";"+"-1"+";"+"\n")
             else:
                 target.write(str(framecounter)+";"+"-1"+";"+"noL3"+";"+"noL3"+";"+"\n")
