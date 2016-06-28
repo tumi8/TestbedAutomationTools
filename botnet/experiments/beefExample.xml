@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>Beef botnet attack</description>
+
+  <!-- Importing libraries -->
+  <include file="../targets/botnetVMs.xml" prefix="tg" />
+  <include file="../tasklists/botnet_attacks_basic.xml" prefix="att" />
+ 
+  <!-- Target element is still required for validity -->
+  <targets/>
+
+  <!-- Tasklist element is still required for validity -->
+  <tasklists/>
+
+  <steps>
+    <!-- Preparation, all steps are mandatory -->
+    <step tasklist="att.beef-attack-preparation" targets="tg.beef-botmaster"/><!-- copy attack scripts to the botmaster -->
+    <step tasklist="att.beef-victim-preparation" targets="tg.windows7-beefvic" /> <!-- prepare the victim VM -->
+    <synchronize />
+    <step tasklist="att.start-beefcc" targets="tg.beef-botmaster" background='true' /> <!-- start botmaster service -->
+    <step tasklist="att.wait" targets="tg.fensalir" />
+    <synchronize />
+    <step tasklist="att.beef-infect" targets="tg.windows7-beefvic" background='true' /> <!-- infect the client -->
+    <step tasklist="att.wait" targets="tg.fensalir" /><!-- wait some seconds -->
+    <!-- stop botmaster and victim processes when experiment ends -->
+    <register-teardown tasklist="att.stop-beefcc" targets="tg.beef-botmaster" />
+    <register-teardown tasklist="att.beef-clean-victims" targets="tg.windows7-beefvic" />
+
+    <!-- for att.beef-infect-chrome the teardown tasklist 'att.beef-stop-chrome' is called instead of 'att.beef-stop' -->
+<!--    <register-teardown tasklist="att.beef-stop-chrome" targets="tg.windows7-beefvic" /> -->
+    <register-teardown tasklist="att.beef-remove-scripts" targets="tg.beef-botmaster" /><!-- Subnet logger example -->
+    <synchronize />
+    <!-- Call your tasks here -->
+    <step tasklist="att.beef-portscan" targets="tg.beef-botmaster" background='true' />
+    <step tasklist="att.wait" targets="tg.fensalir" />
+  </steps>
+</experiment>

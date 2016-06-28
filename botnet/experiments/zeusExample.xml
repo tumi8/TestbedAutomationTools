@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>Zeus botnet attack</description>
+
+  <!-- Importing libraries -->
+  <include file="../targets/botnetVMs.xml" prefix="tg" />
+  <include file="../tasklists/botnet_logging.xml" prefix="log" />
+  <include file="../tasklists/botnet_attacks_basic.xml" prefix="att" />
+ 
+  <!-- Target element is still required for validity -->
+  <targets/>
+
+  <!-- Tasklist element is still required for validity -->
+  <tasklists/>
+
+  <steps>
+    <step tasklist="att.start-zeuscc" targets="tg.zeus-botmaster" /> <!-- Start the ZeusCC (apache2) on the botmaster -->
+    <step tasklist="att.zeus-start-victim" targets="tg.asgard" /> <!-- start the bot VM.. may take a while.. -->
+    <!-- Register postprocessing as teardown task on all executed hosts -->
+    <register-teardown tasklist="att.stop-zeuscc" targets="tg.zeus-botmaster" />
+    <synchronize />
+    <!-- wait until the victim vm finishes booting -->
+    <step tasklist="att.waitMinute" targets="tg.fensalir" />
+    <!-- Call your tasks here -->
+    <synchronize />
+    <!-- Shutdown victim machine -->
+    <step tasklist="att.zeus-stop-victim" targets="tg.windows7-zeusvic" />
+  </steps>
+</experiment>

