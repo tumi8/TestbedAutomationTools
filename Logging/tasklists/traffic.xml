@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>traffic tasklist library</description>
+  
+  <!-- targets element still required for validity -->
+  <targets/>
+
+  <tasklists>
+    <tasklist name="traffic-preparation" on-error="stop-experiment" >
+    <!-- Place all attack scripts on target, add new files here -->
+      <par>
+        <put>
+          <source>../scripts/traffic/http-traffic.sh</source>
+          <destination>http-traffic.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/traffic/urls.txt</source>
+          <destination>urls.txt</destination>
+        </put>
+      </par>
+    </tasklist>
+    <tasklist name="http-traffic">
+    <!-- Create http-traffic using wget and urls.txt, new cgroup created -->
+      <seq>
+        <run>./cgroup.create.sh ./http-traffic.sh</run>
+      </seq>  
+    </tasklist>
+    <tasklist name="user-cgroup">
+    <!-- User-cgroup template, call traffic script using cgroup 5 -->
+      <seq>
+        <run>./cgroup.create.sh -u 5 ping -c 10 8.8.8.8</run>
+      </seq>
+    </tasklist>
+    <tasklist name="ping">
+    <!-- Creating Ping traffic using default cgroup 0 -->
+      <seq>
+        <run>ping -c 10 8.8.8.8</run>
+      </seq>
+    </tasklist>
+    <tasklist name="logged-ping">
+    <!-- Creating Ping traffic, new cgroup created -->
+      <seq>
+        <run>./cgroup.create.sh ping -c 10 8.8.8.8</run>
+      </seq>
+    </tasklist>
+    <tasklist name="remove-traffic-files">
+    <!-- Remove all created files, add new files here -->
+      <par>
+        <run>rm /root/http-traffic.sh</run>
+        <run>rm /root/urls.txt</run>
+      </par>
+    </tasklist>
+  </tasklists>
+
+  <!-- steps element still required for validity -->
+  <steps/>
+
+</experiment>

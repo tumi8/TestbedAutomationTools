@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>attack tasklist library</description>
+  
+  <!-- targets element still required for validity -->
+  <targets/>
+
+  <tasklists>
+    <tasklist name="attack-preparation" on-error="stop-experiment" >
+    <!-- Place all attack scripts on target, add new files here -->
+      <par> 
+        <put>
+          <source>../scripts/attacks/hydra.durchfuehrung.sh</source>
+          <destination>hydra.durchfuehrung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/attacks/beispiel.logins.txt</source>
+          <destination>beispiel.logins.txt</destination>
+        </put>
+        <put>
+          <source>../scripts/attacks/beispiel.passwords.txt</source>
+          <destination>beispiel.passwords.txt</destination>
+        </put>
+        <put>
+          <source>../scripts/attacks/netcatportscan.durchfuehrung.sh</source>
+          <destination>netcatportscan.durchfuehrung.sh</destination>
+        </put>
+      </par>
+    </tasklist>
+    <tasklist name="bruteforce-attack">
+    <!-- Bruteforce ssh on "target" using THC-Hydra-->
+      <seq>
+        <run>./cgroup.create.sh ./hydra.durchfuehrung.sh noatun-attacker-1 ssh beispiel.logins.txt beispiel.passwords.txt 3</run>
+      </seq>
+    </tasklist>
+    <tasklist name="portscan">
+    <!-- Portscan on "target" using netcat -->
+      <seq>
+        <run>./cgroup.create.sh ./netcatportscan.durchfuehrung.sh 172.16.50.55 1-200 5</run>
+      </seq>
+    </tasklist>
+    <tasklist name="remove-attack-files">
+    <!-- Remove all created files, add new files here -->
+      <par>
+        <run>rm /root/hydra.durchfuehrung.sh</run>
+        <run>rm /root/hydra.log</run>
+        <run>rm /root/netcatportscan.durchfuehrung.sh</run>
+        <run>rm /root/beispiel.logins.txt</run>
+        <run>rm /root/beispiel.passwords.txt</run>
+      </par>
+    </tasklist>
+  </tasklists>
+
+  <!-- steps element still required for validity -->
+  <steps/>
+
+</experiment>

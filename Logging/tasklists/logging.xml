@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  <description>logging tasklist library</description>
+  
+  <!-- targets element still required for validity -->
+  <targets />
+
+  <tasklists>
+    <!-- place all scripts and run preparation on host -->
+    <tasklist name="logging-preparation" on-error="stop-experiment" >
+      <seq>
+        <put>
+          <source>../scripts/logging/cgroup.id.log</source>
+          <destination>cgroup.id.log</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/cgroup.create.sh</source>
+          <destination>cgroup.create.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/logging.vorbereitung.sh</source>
+          <destination>logging.vorbereitung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/logging.durchfuehrung.sh</source>
+          <destination>logging.durchfuehrung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/logging.nachbearbeitung.sh</source>
+          <destination>logging.nachbearbeitung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/move.sys.processes.sh</source>
+          <destination>move.sys.processes.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/pcap.convert.sh</source>
+          <destination>pcap.convert.sh</destination>
+        </put>
+        <run>./logging.vorbereitung.sh $iface</run>
+        <!--<run>./move.sys.processes.sh</run>-->
+      </seq>
+    </tasklist>
+    <!-- stop logging and all processes added to pid.temp file on host -->
+    <tasklist name="logging-postprocessing">
+      <seq>
+        <run>./logging.nachbearbeitung.sh</run>
+      </seq>
+    </tasklist>
+    <!-- start capturing process on host -->
+    <tasklist name="logging-execution" on-error="stop-experiment" >
+      <seq>
+        <run>./logging.durchfuehrung.sh</run>
+      </seq>
+    </tasklist>
+    <!-- place all scripts and run preparation on nids monitor -->
+    <tasklist name="subnet-logging-preparation" on-error="stop-experiment" >
+      <seq>
+        <put>
+          <source>../scripts/logging/logging.subnet.vorbereitung.sh</source>
+          <destination>logging.subnet.vorbereitung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/logging.subnet.durchfuehrung.sh</source>
+          <destination>logging.subnet.durchfuehrung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/logging.subnet.nachbearbeitung.sh</source>
+          <destination>logging.subnet.nachbearbeitung.sh</destination>
+        </put>
+        <put>
+          <source>../scripts/logging/subnet.pcap.convert.sh</source>
+          <destination>subnet.pcap.convert.sh</destination>
+        </put>
+        <run>./logging.subnet.vorbereitung.sh</run>
+      </seq>
+    </tasklist>
+    <!-- start capturing process on nids monitor -->
+    <tasklist name="subnet-logging-execution" on-error="stop-experiment" >
+      <seq>
+        <run>./logging.subnet.durchfuehrung.sh $net $iface</run>
+      </seq>
+    </tasklist>
+    <!-- stop logging and all processes added to pid.temp file on nids monitor -->
+    <tasklist name="subnet-logging-postprocessing">
+      <seq>
+        <run>./logging.subnet.nachbearbeitung.sh</run>
+      </seq>
+    </tasklist>
+    <tasklist name="rename" on-error="stop-experiment" >
+      <par>
+        <run>mv allin1.pcap `hostname`.allin1.pcap</run>
+        <run>mv cgroup.id.log `hostname`.cgroup.id.log</run>
+        <run>mv dumpcap.log `hostname`.dumpcap.log</run>
+      </par> 
+    </tasklist>
+    <tasklist name="collect" on-error="stop-experiment" >
+      <par>
+        <get>
+          <source>/root/*allin1.pcap</source>
+          <destination>../results/create-dataset/pcaps/</destination>
+        </get>
+        <get>
+          <source>/root/*cgroup.id.log</source>
+          <destination>../results/create-dataset/ids/</destination>
+        </get>
+        <get>
+          <source>/root/*dumpcap.log</source>
+          <destination>../results/create-dataset/logfiles/</destination>
+        </get>
+      </par>  
+    </tasklist>
+    <tasklist name="collect-na2" on-error="stop-experiment" >
+      <par>
+        <get>
+          <source>/root/allin1.pcap</source>
+          <destination>../results/create-dataset/pcaps/noatun-attacker-2.allin1.pcap</destination>
+        </get>
+        <get>
+          <source>/root/cgroup.id.log</source>
+          <destination>../results/create-dataset/ids/noatun-attacker-2.cgroup.id.log</destination>
+        </get>
+        <get>
+          <source>/root/dumpcap.log</source>
+          <destination>../results/create-dataset/logfiles/noatun-attacker-2.dumpcap.log</destination>
+        </get>
+      </par>
+    </tasklist>
+    <tasklist name="subnet-collect" on-error="stop-experiment" >
+      <par> 
+        <get>
+          <source>/root/local-network2.pcap</source>
+          <destination>../results/create-dataset/local-network2.pcap</destination>
+        </get>
+        <get>
+          <source>/root/dumpcap.log</source>
+          <destination>../results/create-dataset/logfiles/dumpcap.log</destination>
+        </get>
+      </par> 
+    </tasklist>
+    <tasklist name="labeling">
+      <seq>
+        <run>python ../scripts/logging/labeling.py ../results/create-dataset/local-network2.pcap ../results/create-dataset/pcaps/ ../results/create-dataset/ids/ ../results/create-dataset/keyfile.csv  >> labeling.log</run>
+      </seq>
+    </tasklist>
+    <tasklist name="remove-script-files">
+      <par> 
+        <run>rm /root/logging.vorbereitung.sh</run>
+        <run>rm /root/logging.durchfuehrung.sh</run>
+        <run>rm /root/logging.nachbearbeitung.sh</run>
+        <run>rm /root/move.sys.processes.sh</run>
+        <run>rm /root/cgroup.create.sh</run>
+        <run>rm /root/pcap.convert.sh</run>
+      </par>
+    </tasklist>
+    <tasklist name="remove-record-files">
+      <par>
+        <run>rm /root/*allin1.pcap</run>
+        <run>rm /root/allin1.pcapng</run>
+        <run>rm /root/*cgroup.id.log</run>
+        <run>rm /root/*dumpcap.log</run>
+      </par>
+    </tasklist>
+    <tasklist name="remove-subnet-files">
+      <par> 
+        <run>rm /root/local-network$net.pcap</run>
+        <run>rm /root/local-network$net.pcapng</run>
+        <run>rm /root/dumpcap.log</run>
+        <run>rm /root/logging.subnet.nachbearbeitung.sh</run>
+        <run>rm /root/logging.subnet.durchfuehrung.sh</run>
+        <run>rm /root/logging.subnet.vorbereitung.sh</run>
+        <run>rm /root/subnet.pcap.convert.sh</run>
+      </par>
+    </tasklist>
+    <tasklist name="pcap-conversion" on-error="stop-experiment" >
+      <seq>
+        <run>./pcap.convert.sh</run>
+      </seq>  
+    </tasklist>
+    <tasklist name="subnet-pcap-conversion" on-error="stop-experiment" >
+      <seq>
+        <run>./subnet.pcap.convert.sh $net</run>
+      </seq>
+    </tasklist>
+  </tasklists>
+</experiment>
