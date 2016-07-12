@@ -22,6 +22,27 @@ These are the direct dependencies for running the framework:
 
 The version numbers represent the versions we used at development.
 
+Content
+=============
+
+scripts/
+scripts for dataset creation, subdivided into logging attacks and traffic
+
+tasklists/
+gplmt tasklists needed to call the scripts
+
+experiments/
+gplmt experiment XML files
+
+results/
+Output folder for results
+
+targets/
+gplmt target definition XML files
+
+docs/
+documentation sources (e.g. pictures)
+
 How to install?
 ===============
 
@@ -47,4 +68,5 @@ Dumpcap
 On Ubuntu use: `sudo apt-get install wireshark-common`
 
 
+![Topology](/docs/Topology-eng.png)
 This woderful readme is to be continued ... :shipit:
