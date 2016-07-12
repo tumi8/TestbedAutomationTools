@@ -68,5 +68,5 @@ Dumpcap
 On Ubuntu use: `sudo apt-get install wireshark-common`
 
 
-![Topology](/docs/Topology-eng.png)
+![Topology](docs/Topology-eng.png)
 This woderful readme is to be continued ... :shipit:
