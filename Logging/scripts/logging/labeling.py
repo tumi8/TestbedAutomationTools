@@ -140,7 +140,7 @@ def main():
             print("keyfile creation failed, check params")
             sys.exit(0)
 
-    if os.path.exists(dump) is True and os.path.exists(folder) is True and os.path.exists(folder) is True:
+    if os.path.exists(dump) == True and os.path.exists(folder) == True and os.path.exists(folder) == True:
         print("Input valid")
     else:
         print("Check file paths")
@@ -165,12 +165,12 @@ def main():
             pktnbr = framecounter
             pkt = raw_pkt[0]
 
-            if pkt[12:14] is b'\x08\x00' or pkt[12:14] is b'\x86\xdd':
+            if pkt[12:14] == b'\x08\x00' or pkt[12:14] == b'\x86\xdd':
 
                 gefunden = False
                 gefunden = searchpcap(pkt, filenames, pcapdict, framecounter, namedict, target)
 
-                if gefunden is False:#if packet not found write the following to keyfile
+                if gefunden == False:#if packet not found write the following to keyfile
                     target.write(str(framecounter)+";"+"-1"+";"+"\n")
             else:
                 target.write(str(framecounter)+";"+"-1"+";"+"noL3"+";"+"noL3"+";"+"\n")
