@@ -50,14 +50,4 @@ $IPT -A OUTPUT -o $1 -m cgroup --cgroup 0 -j CONNMARK --set-mark 0
 $IPT -A INPUT  -i $1 -m connmark --mark 0 -j NFLOG --nflog-group 0
 $IPT -A OUTPUT -o $1 -m connmark --mark 0 -j NFLOG --nflog-group 0
 
-#User default group, deprecated
-#$IPT -A OUTPUT -o $1 -m cgroup --cgroup 1 -j CONNMARK --set-mark 1
-#$IPT -A INPUT  -i $1 -m connmark --mark 1 -j NFLOG --nflog-group 1
-#$IPT -A OUTPUT -o $1 -m connmark --mark 1 -j NFLOG --nflog-group 1
-
-#2nd default group, deprecated
-#$IPT -A OUTPUT -o $1 -m cgroup --cgroup 2 -j CONNMARK --set-mark 2
-#$IPT -A INPUT  -i $1 -m connmark --mark 2 -j NFLOG --nflog-group 2
-#$IPT -A OUTPUT -o $1 -m connmark --mark 2 -j NFLOG --nflog-group 2
-
 #########################EOF#########################################

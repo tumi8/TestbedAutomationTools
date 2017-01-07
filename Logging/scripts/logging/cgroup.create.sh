@@ -99,10 +99,6 @@ else
 			$IPT -A INPUT  -i $interface -m connmark --mark $param -j NFLOG --nflog-group $param
 			$IPT -A OUTPUT -o $interface -m connmark --mark $param -j NFLOG --nflog-group $param
 
-			#########################Write logfile#############################
-
-			#echo "$param;group$param;"root\;root";$*;"`date --iso-8601=seconds` >> cgroup.id.log ###############################################################################
-
 			#########################Execute command############################
 
 			cgclassify -g net_cls:group$param $*
