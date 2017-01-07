@@ -96,7 +96,7 @@ Local logging
 --------
 To obtain the process information for each packet in the local labeling we use Linux cgroups in conjunction with iptables, nflog and dumpcap.
 
-At first we create a cgroup for every new process and execute it inside the cgroup. Then we use the iptables cgroup matching to mark the connections with its cgroup ID. For every ID we then move the marked traffic to one nflog group. At the end we capture the traffic of these nfloggroups and gain a dump in which the ethernet header is replaced by a nflog header. This header contains the ID by which we can identify the corresponding cgroup. Since we also stored which processes are executed inside the cgroups we can create the correlation of packets and processes.     
+At first we create a cgroup for every new process and execute it inside the cgroup. Then we use the iptables cgroup matching to mark the connections with its cgroup ID. For every ID we then move the marked traffic to one nflog group. At the end we capture the traffic of these nfloggroups and gain a dump in which the ethernet header is replaced by a nflog header. This header contains the ID by which we can identify the corresponding cgroup. Since we also stored which processes are executed inside the cgroups we can create the correlation of packets and processes.
 
 
 Labeling
@@ -107,5 +107,7 @@ The labeling takes the global dumpfile, the local dumpfiles and the cgroupID fil
 
 Keyfile
 --------
+The keyfile is a .csv file (; as separator) containing information about the packetnumber, cgroupID, hostname, cgroup Name, cgroup owner,
+taskfile owner, executed command/script and timestamp at cgroup creation.
 
-This wonderful readme is to be continued ... :shipit:
+A more detailed PDF documentation (in German) will be contained in the Docs folder soon. :shipit:
