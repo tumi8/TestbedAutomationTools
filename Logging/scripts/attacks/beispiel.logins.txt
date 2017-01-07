@@ -1,4 +1,3 @@
 Eve
 Alice
 Bob
-ansii

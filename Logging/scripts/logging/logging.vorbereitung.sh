@@ -1,6 +1,5 @@
 #!/bin/bash
 
-touch foo
 #Logging preparation
 
 #Parameter: interface to be captured from
@@ -35,7 +34,16 @@ echo $1 >> interface
 
 #####################Iptablles-Rules#################################
 
-IPT=/mnt/scratch/iptables/sbin/iptables
+#########################Check-For-Iptables-Version-#################
+version=`cat /etc/lsb-release | grep DISTRIB_RELEASE | tr -d "DISTRIB_RELEASE=,\n" | cut -d '.' -f 1`
+
+if [ $version -lt 16 ]; then
+	##<16##
+	IPT=/mnt/scratch/iptables/sbin/iptables
+else
+	##>16##
+    	IPT=$(which iptables)
+fi
 
 #root group
 $IPT -A OUTPUT -o $1 -m cgroup --cgroup 0 -j CONNMARK --set-mark 0

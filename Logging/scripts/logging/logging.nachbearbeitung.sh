@@ -46,7 +46,16 @@ for i in {1..9}
 
 #Clear IPT-iptables
 
-IPT=/mnt/scratch/iptables/sbin/iptables
+#########################Check-For-Iptables-Version-#####################
+version=`cat /etc/lsb-release | grep DISTRIB_RELEASE | tr -d "DISTRIB_RELEASE=,\n" | cut -d '.' -f 1`
+
+if [ $version -lt 16 ]; then
+	##<16##
+	IPT=/mnt/scratch/iptables/sbin/iptables
+else
+	##>16##
+    	IPT=$(which iptables)
+fi
 
 $IPT -F
 

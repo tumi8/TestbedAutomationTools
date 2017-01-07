@@ -14,4 +14,4 @@ echo "Hydra initiated, starting in $waiting seconds"
 sleep $waiting
 
 echo "starting bruteforce-attack"
-hydra -L $loginpath -P $pwpath $dstip $service >> hydra.log;
+hydra -L $loginpath -P $pwpath $dstip $service;

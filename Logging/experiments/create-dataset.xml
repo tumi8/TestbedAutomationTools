@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>Creating IDS data sets</description>
+
+  <!-- Importing libraries -->
+  <include file="../targets/targets.xml" prefix="tg" />
+  <include file="../tasklists/logging.xml" prefix="log" />
+  <include file="../tasklists/attacks.xml" prefix="att" />
+  <include file="../tasklists/traffic.xml" prefix="tff" />
+ 
+  <!-- Target element is still required for validity -->
+  <targets/>
+
+  <!-- Tasklist element is still required for validity -->
+  <tasklists/>
+
+  <steps>
+    <!-- Preparation, all steps are mandatory -->
+    <step tasklist="log.logging-preparation" targets="tg.productive-vms" /><!-- mandatory on all host except the subnet logger -->
+    <step tasklist="att.attack-preparation" targets="tg.noatun-attacker-2" /><!-- Attacker example -->
+    <step tasklist="tff.traffic-preparation" targets="tg.noatun-attacker-1" /><!-- Traffic example -->
+    <step tasklist="log.subnet-logging-preparation" targets="tg.bilskinir" /><!-- Subnet logger example -->
+    <synchronize />
+    <!-- Start packet capturing, all steps are mandatory -->
+    <step tasklist="log.subnet-logging-execution" targets="tg.bilskinir" background='true' /><!-- Subnet logger example -->
+    <step tasklist="log.logging-execution" targets="tg.productive-vms" background='true' /><!-- mandatory on all host except the subnet logger -->
+    <!-- Register postprocessing as teardown task on all executed hosts -->
+    <register-teardown tasklist="log.logging-postprocessing" targets="tg.productive-vms" /><!-- mandatory on all host except the subnet logger -->
+    <register-teardown tasklist="log.subnet-logging-postprocessing" targets="tg.bilskinir" /><!-- Subnet logger example -->
+    <synchronize />
+    <!-- Call your tasks here -->
+    <step tasklist="tff.ping" targets="tg.noatun-attacker-1" />
+    <step tasklist="att.portscan" targets="tg.noatun-attacker-2" />
+    <step tasklist="tff.http-traffic" targets="tg.noatun-attacker-1" />
+    <step tasklist="tff.logged-ping" targets="tg.noatun-attacker-1" />
+    <step tasklist="att.bruteforce-attack" targets="tg.noatun-attacker-2" />
+    <step tasklist="tff.user-cgroup" targets="tg.noatun-attacker-1" />
+    <!-- -->
+    <synchronize />
+    <!-- Call postprocessing task on all executed hosts, all steps are mandatory -->
+    <step tasklist="log.logging-postprocessing" targets="tg.productive-vms" /><!-- mandatory on all host except the subnet logger -->
+    <step tasklist="log.subnet-logging-postprocessing" targets="tg.bilskinir" /><!-- Subnet logger example -->
+    <synchronize />
+    <!-- Call rename task on all executed hosts, all steps are mandatory -->
+    <step tasklist="log.rename" targets="tg.productive-vms" />
+    <synchronize />
+    <step tasklist="log.collect" targets="tg.productive-vms" />
+    <step tasklist="log.subnet-collect" targets="tg.bilskinir" />
+    <synchronize />
+    <!-- Labeling and removing files from hosts, all steps are mandatory -->
+    <step tasklist="log.labeling" targets="tg.fensalir" />
+    <register-teardown tasklist="log.remove-record-files" targets="tg.productive-vms" /><!-- mandatory on all host except the subnet logger -->
+    <register-teardown tasklist="log.remove-subnet-files" targets="tg.bilskinir" /><!-- Subnet logger example -->
+  </steps>
+</experiment>

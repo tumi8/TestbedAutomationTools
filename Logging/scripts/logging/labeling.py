@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#  Labeling.py, used to create keyfiles for network dumps 
+#  Labeling.py, used to create keyfiles for network dumps
 #  Copyright (C) 2016  Christian Luebben
 #  Params: main dump, dump-folder, id-folder, keyfile
 #  Remark: UID and GID available in tlv header
@@ -97,9 +97,8 @@ def loadpcaps(folder, namedict):
     pcapdict = {}
 
     for filename in filenames:
-        #TODO check for file extension, if not pcap call function
         packetdict = {}
-        
+
         with RawPcapReader(folder+filename) as sub_pcap_reader:
             for sub_raw_pkt in sub_pcap_reader:
                 sub_pkt = sub_raw_pkt[0]
@@ -140,7 +139,7 @@ def main():
             print("keyfile creation failed, check params")
             sys.exit(0)
 
-    if os.path.exists(dump) == True and os.path.exists(folder) == True and os.path.exists(folder) == True:
+    if os.path.exists(dump) and os.path.exists(folder) and os.path.exists(folder):
         print("Input valid")
     else:
         print("Check file paths")
@@ -149,6 +148,7 @@ def main():
     namedict = createiddict(idfolder) #namedict[filename] = corresponding idfile as iddict[cgroupID] = values)
 
     framecounter = 0
+    pktnbr = -1
 
     ldpcapstart = timer()
 
@@ -170,14 +170,11 @@ def main():
                 gefunden = False
                 gefunden = searchpcap(pkt, filenames, pcapdict, framecounter, namedict, target)
 
-                if gefunden == False:#if packet not found write the following to keyfile
+                if gefunden is False:#if packet not found write the following to keyfile
                     target.write(str(framecounter)+";"+"-1"+";"+"\n")
             else:
                 target.write(str(framecounter)+";"+"-1"+";"+"noL3"+";"+"noL3"+";"+"\n")
                 continue
-
-        #except:
-            #print ("malformed packet")
 
     labend = timer()
     target.close()

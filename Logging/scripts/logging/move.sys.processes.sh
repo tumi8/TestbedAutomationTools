@@ -2,6 +2,14 @@
 
 #Move pre-started system processes into cgroups grouped by process owner
 #remark: also one cgroup per pid possible
+
+	#########################Check-For-System-Version-######################################
+	version=`cat /etc/lsb-release | grep DISTRIB_RELEASE | tr -d "DISTRIB_RELEASE=,\n" | cut -d '.' -f 1`
+	version2=`cat /etc/lsb-release | grep DISTRIB_RELEASE | tr -d "DISTRIB_RELEASE=,\n" | cut -d '.' -f 2`
+	if [ $version -le 15 ] && [ $version2 -lt 10 ]; then
+		##< Linux 16##
+		IPT=/mnt/scratch/iptables/sbin/iptables
+
 while IFS=' ' read -r f1
   do
     echo $f1
@@ -31,8 +39,7 @@ while IFS=' ' read -r f1
 	#########################Iptablles-Rules###########################
 
 	interface=`head -n 1 interface`
-	IPT=/mnt/scratch/iptables/sbin/iptables
-
+	
 	$IPT -A OUTPUT -o $interface -m cgroup --cgroup $ClsID -j CONNMARK --set-mark $ClsID
 	$IPT -A INPUT  -i $interface -m connmark --mark $ClsID -j NFLOG --nflog-group $ClsID
 	$IPT -A OUTPUT -o $interface -m connmark --mark $ClsID -j NFLOG --nflog-group $ClsID
@@ -49,5 +56,8 @@ while IFS=' ' read -r f1
 	fi
 
   done < /sys/fs/cgroup/net_cls/tasks
-
+	else
+		##> Linux 16, moving sys processes not working##
+    		IPT=$(which iptables)
+	fi
   #########################EOF#########################################

@@ -45,10 +45,10 @@
       </seq>
     </tasklist>
     <tasklist name="remove-traffic-files">
-    <!-- Remove all created files, add new files here -->
+    <!-- Remove all created files, add new files here, deprecated -->
       <par>
-        <run>rm /root/http-traffic.sh</run>
-        <run>rm /root/urls.txt</run>
+        <run>rm http-traffic.sh</run>
+        <run>rm urls.txt</run>
       </par>
     </tasklist>
   </tasklists>

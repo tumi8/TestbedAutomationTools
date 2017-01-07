@@ -41,13 +41,12 @@
       </seq>
     </tasklist>
     <tasklist name="remove-attack-files">
-    <!-- Remove all created files, add new files here -->
+    <!-- Remove all created files, add new files here, deprecated -->
       <par>
-        <run>rm /root/hydra.durchfuehrung.sh</run>
-        <run>rm /root/hydra.log</run>
-        <run>rm /root/netcatportscan.durchfuehrung.sh</run>
-        <run>rm /root/beispiel.logins.txt</run>
-        <run>rm /root/beispiel.passwords.txt</run>
+        <run>rm hydra.durchfuehrung.sh</run>
+        <run>rm netcatportscan.durchfuehrung.sh</run>
+        <run>rm beispiel.logins.txt</run>
+        <run>rm beispiel.passwords.txt</run>
       </par>
     </tasklist>
   </tasklists>

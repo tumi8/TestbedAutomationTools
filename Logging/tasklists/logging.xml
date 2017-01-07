@@ -33,12 +33,8 @@
           <source>../scripts/logging/move.sys.processes.sh</source>
           <destination>move.sys.processes.sh</destination>
         </put>
-        <put>
-          <source>../scripts/logging/pcap.convert.sh</source>
-          <destination>pcap.convert.sh</destination>
-        </put>
         <run>./logging.vorbereitung.sh $iface</run>
-        <!--<run>./move.sys.processes.sh</run>-->
+        <run>./move.sys.processes.sh</run>
       </seq>
     </tasklist>
     <!-- stop logging and all processes added to pid.temp file on host -->
@@ -68,10 +64,6 @@
           <source>../scripts/logging/logging.subnet.nachbearbeitung.sh</source>
           <destination>logging.subnet.nachbearbeitung.sh</destination>
         </put>
-        <put>
-          <source>../scripts/logging/subnet.pcap.convert.sh</source>
-          <destination>subnet.pcap.convert.sh</destination>
-        </put>
         <run>./logging.subnet.vorbereitung.sh</run>
       </seq>
     </tasklist>
@@ -87,100 +79,65 @@
         <run>./logging.subnet.nachbearbeitung.sh</run>
       </seq>
     </tasklist>
+    <!-- rename to make filenames unique before transfering -->
     <tasklist name="rename" on-error="stop-experiment" >
       <par>
-        <run>mv allin1.pcap `hostname`.allin1.pcap</run>
+        <run>mv allin1.pcapng `hostname`.allin1.pcapng</run>
         <run>mv cgroup.id.log `hostname`.cgroup.id.log</run>
         <run>mv dumpcap.log `hostname`.dumpcap.log</run>
       </par> 
     </tasklist>
+    <!-- collect files, as filenames depend on hostname asterisk is used -->
     <tasklist name="collect" on-error="stop-experiment" >
       <par>
         <get>
-          <source>/root/*allin1.pcap</source>
+          <source>*allin1.pcapng</source>
           <destination>../results/create-dataset/pcaps/</destination>
         </get>
         <get>
-          <source>/root/*cgroup.id.log</source>
+          <source>*cgroup.id.log</source>
           <destination>../results/create-dataset/ids/</destination>
         </get>
         <get>
-          <source>/root/*dumpcap.log</source>
+          <source>*dumpcap.log</source>
           <destination>../results/create-dataset/logfiles/</destination>
         </get>
       </par>  
     </tasklist>
-    <tasklist name="collect-na2" on-error="stop-experiment" >
-      <par>
-        <get>
-          <source>/root/allin1.pcap</source>
-          <destination>../results/create-dataset/pcaps/noatun-attacker-2.allin1.pcap</destination>
-        </get>
-        <get>
-          <source>/root/cgroup.id.log</source>
-          <destination>../results/create-dataset/ids/noatun-attacker-2.cgroup.id.log</destination>
-        </get>
-        <get>
-          <source>/root/dumpcap.log</source>
-          <destination>../results/create-dataset/logfiles/noatun-attacker-2.dumpcap.log</destination>
-        </get>
-      </par>
-    </tasklist>
+    <!-- collect files, as filenames depend on network asterisk is used -->
     <tasklist name="subnet-collect" on-error="stop-experiment" >
       <par> 
         <get>
-          <source>/root/local-network2.pcap</source>
-          <destination>../results/create-dataset/local-network2.pcap</destination>
+          <source>local-network*.pcapng</source>
+          <destination>../results/create-dataset/</destination>
         </get>
         <get>
-          <source>/root/dumpcap.log</source>
+          <source>dumpcap.log</source>
           <destination>../results/create-dataset/logfiles/dumpcap.log</destination>
         </get>
       </par> 
     </tasklist>
     <tasklist name="labeling">
       <seq>
-        <run>python ../scripts/logging/labeling.py ../results/create-dataset/local-network2.pcap ../results/create-dataset/pcaps/ ../results/create-dataset/ids/ ../results/create-dataset/keyfile.csv  >> labeling.log</run>
+        <run>python3 ../scripts/logging/labeling.py ../results/create-dataset/local-network*.pcapng ../results/create-dataset/pcaps/ ../results/create-dataset/ids/ ../results/create-dataset/keyfile.csv  >> ../results/create-dataset/logfiles/labeling.log</run>
       </seq>
     </tasklist>
-    <tasklist name="remove-script-files">
-      <par> 
-        <run>rm /root/logging.vorbereitung.sh</run>
-        <run>rm /root/logging.durchfuehrung.sh</run>
-        <run>rm /root/logging.nachbearbeitung.sh</run>
-        <run>rm /root/move.sys.processes.sh</run>
-        <run>rm /root/cgroup.create.sh</run>
-        <run>rm /root/pcap.convert.sh</run>
-      </par>
-    </tasklist>
+    <!-- remove files, as filenames depend on hostname asterisk is used -->
     <tasklist name="remove-record-files">
       <par>
-        <run>rm /root/*allin1.pcap</run>
-        <run>rm /root/allin1.pcapng</run>
-        <run>rm /root/*cgroup.id.log</run>
-        <run>rm /root/*dumpcap.log</run>
+        <run>rm *allin1.pcapng</run>
+        <run>rm *cgroup.id.log</run>
+        <run>rm *dumpcap.log</run>
       </par>
     </tasklist>
     <tasklist name="remove-subnet-files">
       <par> 
-        <run>rm /root/local-network$net.pcap</run>
-        <run>rm /root/local-network$net.pcapng</run>
-        <run>rm /root/dumpcap.log</run>
-        <run>rm /root/logging.subnet.nachbearbeitung.sh</run>
-        <run>rm /root/logging.subnet.durchfuehrung.sh</run>
-        <run>rm /root/logging.subnet.vorbereitung.sh</run>
-        <run>rm /root/subnet.pcap.convert.sh</run>
+        <run>rm local-network$net.pcapng</run>
+        <run>rm dumpcap.log</run>
+        <run>rm logging.subnet.nachbearbeitung.sh</run>
+        <run>rm logging.subnet.durchfuehrung.sh</run>
+        <run>rm logging.subnet.vorbereitung.sh</run>
       </par>
-    </tasklist>
-    <tasklist name="pcap-conversion" on-error="stop-experiment" >
-      <seq>
-        <run>./pcap.convert.sh</run>
-      </seq>  
-    </tasklist>
-    <tasklist name="subnet-pcap-conversion" on-error="stop-experiment" >
-      <seq>
-        <run>./subnet.pcap.convert.sh $net</run>
-      </seq>
     </tasklist>
   </tasklists>
 </experiment>

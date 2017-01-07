@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<experiment>
+  
+  <description>Target library</description>
+  
+  <targets>
+    <!-- Add new groups here -->
+    <target name="productive-vms" type="group">
+      <target ref="noatun-attacker-1"/>
+      <target ref="noatun-attacker-2"/>
+    </target>
+    <!-- Add new targets here, set iface to productive net interface -->
+    <target name="noatun-attacker-1" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-1.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-2" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-2.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-3" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-3.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-4" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-4.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+     <target name="noatun-attacker-5" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-5.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-6" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-6.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-7" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-7.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <target name="noatun-attacker-8" type="ssh">
+      <user>root</user>
+      <host>noatun-attacker-8.control.vitsi.test</host>
+      <export-env var="iface" value="eth0"/>
+    </target>
+    <!-- -->
+    <!-- Add new Subnet logger here, set iface to monitor interface, set net to logged network number -->
+    <target name="bilskinir" type="ssh">
+      <user>root</user>
+      <host>bilskinir-nids.control.vitsi.test</host>
+      <export-env var="iface" value="eth3"/>
+      <export-env var="net" value="2"/>
+    </target>
+    <!--  -->
+    <!-- GPLMT execution host -->
+    <target name="fensalir" type="local"/>
+    <export-env var="folder" value="create-dataset"/>
+  </targets>
+
+  <!-- Tasklist element is still required for validity -->
+  <tasklists/>
+  
+  <!-- steps element still required for validity -->
+  <steps/>
+
+</experiment>
